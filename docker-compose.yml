@@ -1,0 +1,30 @@
+version: "3.8"
+name: "javascript-test"
+
+services:
+  js-test-service:
+    build: .
+    image: javascript-test
+    ports:
+      - "${API_PORT}:3000"
+    environment:
+      - API_PORT=${API_PORT}
+      - MONGO_URI=${MONGO_URI}
+      - CONTENTFUL_SPACE_ID=${CONTENTFUL_SPACE_ID}
+      - CONTENTFUL_ENVIRONMENT=${CONTENTFUL_ENVIRONMENT}
+      - CONTENTFUL_ACCESS_TOKEN=${CONTENTFUL_ACCESS_TOKEN}
+      - CONTENTFUL_CONTENT_TYPE=${CONTENTFUL_CONTENT_TYPE}
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb:/data/db
+      - mongodb_config:/data/configdb
+
+volumes:
+  mongodb:
+  mongodb_config:
