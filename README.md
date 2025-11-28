@@ -134,4 +134,14 @@ If you changed the port or Swagger path, adjust the URL accordingly.
 
 ---
 
+## Gen AI Usage
+
+During the development of this project, I used generative AI for the following tasks:
+1. Help on unit test creation.
+2. Help on elaborating the README documentation.
+3. Help on setting up Mongoose.
+4. Help on setting up authentication.
+
+---
+
 **For any issues, check your `.env` values and Docker logs.**
