@@ -10,9 +10,9 @@ import {
 } from '@nestjs/swagger';
 
 @ApiBearerAuth()
-@ApiTags('Report')
+@ApiTags('Reports')
 @UseGuards(JwtAuthGuard)
-@Controller('report')
+@Controller('reports')
 export class ReportController {
   constructor(private readonly productRepository: ProductRepository) {}
 
