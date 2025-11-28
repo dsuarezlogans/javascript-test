@@ -27,26 +27,51 @@ describe('SyncService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should sync content from Contentful and upsert products', async () => {
-    const mockEntries = {
+  it('should sync content from Contentful and upsert products (with pagination)', async () => {
+    const mockEntriesPage1 = {
       items: [
         { sys: { id: '1' }, fields: { sku: 1 } },
         { sys: { id: '2' }, fields: { sku: 2 } },
       ],
+      total: 4,
     };
-    contentfulService.getEntries.mockResolvedValue(mockEntries);
+    const mockEntriesPage2 = {
+      items: [
+        { sys: { id: '3' }, fields: { sku: 3 } },
+        { sys: { id: '4' }, fields: { sku: 4 } },
+      ],
+      total: 4,
+    };
+
+    contentfulService.getEntries
+      .mockResolvedValueOnce(mockEntriesPage1)
+      .mockResolvedValueOnce(mockEntriesPage2);
 
     await service.syncContent();
 
     expect(contentfulService.getEntries).toHaveBeenCalledWith({
       content_type: 'product',
+      skip: 0,
+      limit: 1000,
     });
-    expect(productRepository.upsertByContentfulId).toHaveBeenCalledTimes(2);
+    expect(contentfulService.getEntries).toHaveBeenCalledWith({
+      content_type: 'product',
+      skip: 1000,
+      limit: 1000,
+    });
+
+    expect(productRepository.upsertByContentfulId).toHaveBeenCalledTimes(4);
     expect(productRepository.upsertByContentfulId).toHaveBeenCalledWith(
-      mockEntries.items[0],
+      mockEntriesPage1.items[0],
     );
     expect(productRepository.upsertByContentfulId).toHaveBeenCalledWith(
-      mockEntries.items[1],
+      mockEntriesPage1.items[1],
+    );
+    expect(productRepository.upsertByContentfulId).toHaveBeenCalledWith(
+      mockEntriesPage2.items[0],
+    );
+    expect(productRepository.upsertByContentfulId).toHaveBeenCalledWith(
+      mockEntriesPage2.items[1],
     );
   });
 });

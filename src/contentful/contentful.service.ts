@@ -2,9 +2,13 @@
 import { Injectable } from '@nestjs/common';
 import { createClient, EntryFieldTypes } from 'contentful';
 
-type ProductEntrySkeleton = {
+export type ProductEntrySkeleton = {
   contentTypeId: 'product';
-  id: EntryFieldTypes.Text;
+  sys: {
+    id: string;
+    createdAt: string;
+    updatedAt: string;
+  };
   fields: {
     sku: EntryFieldTypes.Number;
     name: EntryFieldTypes.Text;

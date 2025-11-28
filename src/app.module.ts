@@ -5,6 +5,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ContentfulModule } from './contentful/contentful.module';
 import { SyncModule } from './sync/sync.module';
 import { ProductModule } from './product/product.module';
+import { ReportModule } from './report/report.module';
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/js-test';
 
@@ -15,6 +16,7 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/js-test';
     MongooseModule.forRoot(MONGO_URI),
     ScheduleModule.forRoot(),
     SyncModule,
+    ReportModule,
   ],
   controllers: [],
   providers: [],

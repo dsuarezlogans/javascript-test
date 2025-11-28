@@ -11,6 +11,9 @@ export interface ProductDocument extends Document {
   price: number;
   currency: string;
   stock: number;
+  deleted?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export const ProductSchema = new Schema<ProductDocument>({
@@ -24,4 +27,7 @@ export const ProductSchema = new Schema<ProductDocument>({
   price: Number,
   currency: String,
   stock: Number,
+  deleted: { type: Boolean, default: false },
+  createdAt: Date,
+  updatedAt: Date,
 });

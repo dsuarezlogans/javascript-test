@@ -1,11 +1,58 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Delete,
+  Param,
+  NotFoundException,
+} from '@nestjs/common';
 import { ProductRepository } from './product.repository';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiParam,
+} from '@nestjs/swagger';
 
+@ApiTags('Products')
 @Controller('products')
 export class ProductController {
   constructor(private readonly productRepository: ProductRepository) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all products with pagination and filters' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: String,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'name',
+    required: false,
+    type: String,
+    description: 'Filter by product name (partial match)',
+  })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    type: String,
+    description: 'Filter by category',
+  })
+  @ApiQuery({
+    name: 'minPrice',
+    required: false,
+    type: String,
+    description: 'Minimum price',
+  })
+  @ApiQuery({
+    name: 'maxPrice',
+    required: false,
+    type: String,
+    description: 'Maximum price',
+  })
+  @ApiResponse({ status: 200, description: 'Paginated list of products' })
   async findAll(
     @Query('page') page: string = '1',
     @Query('name') name?: string,
@@ -17,7 +64,8 @@ export class ProductController {
     const pageSize = 5;
     const skip = (pageNumber - 1) * pageSize;
 
-    const filter: Record<string, any> = {};
+    // Build filter object
+    const filter: Record<string, any> = { deleted: { $ne: true } };
     if (name) {
       filter.name = { $regex: name, $options: 'i' };
     }
@@ -30,9 +78,10 @@ export class ProductController {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
+    // Apply filters to both find and countDocuments
     const [items, total] = await Promise.all([
       this.productRepository.find(filter, undefined, { skip, limit: pageSize }),
-      this.productRepository.countDocuments(),
+      this.productRepository.countDocuments(filter),
     ]);
 
     return {
@@ -42,5 +91,22 @@ export class ProductController {
       pageSize,
       totalPages: Math.ceil(total / pageSize),
     };
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a product by ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Product ID (contentfulId)',
+  })
+  @ApiResponse({ status: 200, description: 'Product deleted' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
+  async softDelete(@Param('id') id: string) {
+    const result = await this.productRepository.softDelete(id);
+    if (!result) {
+      throw new NotFoundException('Product not found');
+    }
+    return { message: 'Product deleted' };
   }
 }
