@@ -7,9 +7,11 @@
 Create a `.env` file in the root of your project. Here is an example you can copy:
 
 ```env
+API_PORT=3000
+
 # Contentful
-CONTENTFUL_SPACE_ID=your_space_id
-CONTENTFUL_ACCESS_TOKEN=your_access_token
+CONTENTFUL_SPACE_ID=bbd24zg4yngm
+CONTENTFUL_ACCESS_TOKEN=your_access_token # copy from js test pdf
 CONTENTFUL_ENVIRONMENT=master
 
 # MongoDB
